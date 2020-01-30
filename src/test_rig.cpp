@@ -2,52 +2,62 @@
 #include "AccelStepper.h"
 
 int dir_pin = 8;
-int step_pin = 11;
+int step_pin = 3;
 int enable_pin = 12;
 int reset_pin = 13;
 
 //AccelStepper motor(1, step_pin, dir_pin);
 
+int min_freq = 1000;
+int max_freq = 5000;
+unsigned long half_delay_us = 500000/min_freq;
+unsigned long min_delay = 500000/max_freq;
+
 void setup() {
   Serial.begin(9600);
 
   //analogWrite(enable_pin, 255); //255 is disabled
+  //analogWrite(enable_pin, 0); //255 is disabled
 
-  analogWrite(enable_pin, 0); //255 is disabled
-  //motor.setSpeed(500);
-  pinMode(6, OUTPUT);
-  analogWrite(6, 30);
+  //motor.setSpeed(10);
+  //pinMode(step_pin, OUTPUT);
+  Serial.println(half_delay_us);
+  Serial.println(min_delay);
+
+  // Just using the internal clock, all these work (apart from the 30kHz one)
+  //analogWrite(3, 155);  //this works. Very slow
+  //delay(1000);
+  //TCCR2B = TCCR2B & B11111000 | B00000011; //this also //works
+  //delay(1000);
+  //TCCR2B = TCCR2B & B11111000 | B00000010; //as well
+  //delay(1000);
+  //TCCR2B = TCCR2B & B11111000 | B00000001; //30kHz. Nope
+
 }
 
 void loop() {
+  //motor.setSpeed(speed);
   //motor.runSpeed();
-  //int pot = analogRead(A0)*1;
-  //Serial.println(pot);
-  //motor.setSpeed(pot);
-  //motor.runSpeed();
-
-  Serial.println("Forwards");
-  analogWrite(reset_pin, 255);
-  analogWrite(enable_pin, 0);
-  analogWrite(dir_pin, 255);
-  delay(500);
-  analogWrite(enable_pin, 255);
-  analogWrite(reset_pin, 0);
-
-  Serial.println("~~pause~~");
-  delay(2000);
-
-  Serial.println("Reverse");
-  analogWrite(reset_pin, 255);
-  analogWrite(enable_pin, 0);
-  analogWrite(dir_pin, 0);
-  delay(500);
-  analogWrite(enable_pin, 255);
-  analogWrite(reset_pin, 0);
-
-  Serial.println("~~pause~~");
-  delay(2000);
-
+  //delay(100);
+  //speed = speed+10;
+  //Serial.println(speed);
+  //digitalWrite(step_pin, LOW);
+  //delayMicroseconds(half_delay_us);
+  //digitalWrite(step_pin, HIGH);
+  //delayMicroseconds(half_delay_us);
+  //half_delay_us = half_delay_us+dt;
+  //Serial.println(half_delay_us);
+  //delay(10000);
+  for (int i=0; i<10; i++){
+    analogWrite(7, 0);
+    delayMicroseconds(half_delay_us);
+    analogWrite(7, 255);
+    delayMicroseconds(half_delay_us);
+  }
+  if (half_delay_us>min_delay) {
+    half_delay_us = half_delay_us-1;
+    Serial.println(half_delay_us);
+  }
 }
 
 
