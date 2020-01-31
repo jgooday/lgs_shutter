@@ -1,58 +1,58 @@
 #include "Arduino.h"
 #include "AccelStepper.h"
 
-int dir_pin = 8;
-int step_pin = 11;
-int enable_pin = 12;
-int reset_pin = 13;
+void enable_motor();
+void disable_motor();
 
-//AccelStepper motor(1, step_pin, dir_pin);
+int dir_pin = 8;
+int step_pin = 7;
+int enable_pin = 12;
+int mc_pin = 3;
+int sc_pin = 4;
+
+bool motor_enabled = false;
+
+AccelStepper motor(1, step_pin, dir_pin);
 
 void setup() {
   Serial.begin(9600);
 
-  //analogWrite(enable_pin, 255); //255 is disabled
+  pinMode(mc_pin, INPUT);
+  attachInterrupt(digitalPinToInterrupt(mc_pin), disable_motor, RISING);
+  //pinMode(sc_pin, INPUT);
+  //attachInterrupt(digitalPinToInterrupt(sc_pin), enable_motor, RISING);
 
-  analogWrite(enable_pin, 0); //255 is disabled
-  //motor.setSpeed(500);
-  pinMode(6, OUTPUT);
-  analogWrite(6, 30);
+  motor.setMaxSpeed(2100);
+  motor.setAcceleration(1500);
+  motor.moveTo(5000);
+
+  //delay(5000);
+  //enable_motor();
+  //Serial.println("Motor enabled");
+  //delay(5000);
+  //Serial.println("Running test profile...");
+  //disable_motor();
 }
 
 void loop() {
-  //motor.runSpeed();
-  //int pot = analogRead(A0)*1;
-  //Serial.println(pot);
-  //motor.setSpeed(pot);
-  //motor.runSpeed();
-
-  Serial.println("Forwards");
-  analogWrite(reset_pin, 255);
-  analogWrite(enable_pin, 0);
-  analogWrite(dir_pin, 255);
-  delay(500);
-  analogWrite(enable_pin, 255);
-  analogWrite(reset_pin, 0);
-
-  Serial.println("~~pause~~");
-  delay(2000);
-
-  Serial.println("Reverse");
-  analogWrite(reset_pin, 255);
-  analogWrite(enable_pin, 0);
-  analogWrite(dir_pin, 0);
-  delay(500);
-  analogWrite(enable_pin, 255);
-  analogWrite(reset_pin, 0);
-
-  Serial.println("~~pause~~");
-  delay(2000);
-
+  if (motor.distanceToGo() == 0){
+    motor.moveTo(-motor.currentPosition());
+  }
+  motor.run();
+  //Serial.println(motor_enabled);
 }
 
+void enable_motor(){
+  // Enable is logical low
+  analogWrite(enable_pin, 0);
+  motor_enabled = true;
+}
 
-
-
+void disable_motor(){
+  // Enable is logical low
+  analogWrite(enable_pin, 255);
+  motor_enabled = false;
+}
 
 
 
