@@ -4,43 +4,66 @@
 void enable_motor();
 void disable_motor();
 
-int dir_pin = 8;
+int dir_pin = 13;
 int step_pin = 7;
 int enable_pin = 12;
-int mc_pin = 3;
-int sc_pin = 4;
+int mc_pin = 8;
+int sc_pin = 3;
 
 bool motor_enabled = false;
 
-AccelStepper motor(1, step_pin, dir_pin);
+//AccelStepper motor(1, step_pin, dir_pin);
+
+volatile uint8_t portbhistory = 0xFF;     // default is high because the pull-up
 
 void setup() {
   Serial.begin(9600);
 
-  pinMode(mc_pin, INPUT);
-  attachInterrupt(digitalPinToInterrupt(mc_pin), disable_motor, RISING);
-  //pinMode(sc_pin, INPUT);
-  //attachInterrupt(digitalPinToInterrupt(sc_pin), enable_motor, RISING);
+  // Enable pin change interrupt on the PCINT18 pin using Pin Change Mask Register 2 (PCMSK2)
+  PCMSK2 |= _BV(PCINT18);
 
-  motor.setMaxSpeed(2100);
-  motor.setAcceleration(1500);
-  motor.moveTo(5000);
+  // Enable pin change interrupt 2 using the Pin Change Interrrupt Control Register (PCICR)
+  PCICR |= _BV(PCIE2);
 
-  //delay(5000);
-  //enable_motor();
-  //Serial.println("Motor enabled");
-  //delay(5000);
-  //Serial.println("Running test profile...");
-  //disable_motor();
+  //motor.setMaxSpeed(2100);
+  //motor.setAcceleration(1500);
+  //motor.moveTo(5000);
+
+  analogWrite(8, 255);
+
 }
 
 void loop() {
-  if (motor.distanceToGo() == 0){
-    motor.moveTo(-motor.currentPosition());
-  }
-  motor.run();
+  //if (motor.distanceToGo() == 0){
+  //  motor.moveTo(-motor.currentPosition());
+  //}
+  //motor.run();
   //Serial.println(motor_enabled);
 }
+
+
+ISR(PCINT2_vect)
+{
+  //digitalWrite()
+    //// Read PD2 using the Port D Pin Input Register (PIND)
+    //if (PIND & _BV(PIND2))
+    //{
+    //    // PD2 is high, so button is released
+
+    //    // Set PB5 low using the Port B Data Register (PORTB)
+    //    PORTB &= ~_BV(PORTB5);
+    //}
+    //else
+    //{
+    //    // PD2 is low, so button is pressed
+
+    //    // Set PB5 high using the Port B Data Register (PORTB)
+    //    PORTB |= _BV(PORTB5);
+    //}
+}
+
+
+
 
 void enable_motor(){
   // Enable is logical low
