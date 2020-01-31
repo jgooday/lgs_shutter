@@ -16,7 +16,7 @@ install:
     - platformio update
     # Libraries from PlatformIO Library Registry:
     # https://platformio.org/lib/show/265/AccelStepper
-    - pio lib install "AccelStepper"
+    - platformio lib -g install 265
 
 script:
     - platformio ci --board=uno
