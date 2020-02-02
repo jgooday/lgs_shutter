@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "AccelStepper.h"
 
+void update_operation();
 void read_state();
 void enable_motor();
 void disable_motor();
@@ -67,9 +68,13 @@ void setup() {
     pinMode(12, OUTPUT); // enable indicator
     pinMode(13, OUTPUT); // dir indicator
 
-    motor.setMaxSpeed(2100);
+    // Set up motor
+    motor.setMaxSpeed(1000);//2100);
     motor.setAcceleration(1500);
     disable_motor();
+
+    // Initialise operative state
+    update_operation();
 
 }
 
@@ -83,9 +88,16 @@ void loop() {
 }
 
 ISR(PCINT2_vect) {
-  // Handles interrupts on PORTD. Reads the state
-  // of all inputs, then runs the logic derived
-  // using the truth table to operate the motor
+  // Handles all interrupts on port D
+  // Directs straight to update the operational
+  // state of the device
+  update_operation();
+}
+
+void update_operation() {
+  // Reads the state of all inputs, then runs
+  // the logic derived using the truth table
+  // to operate the motor
   //
   // Note: as there is currently no MO limit
   // switch, it's been left out of logic statements
