@@ -24,7 +24,6 @@ int magnet_pin = 5;
 int fault_indicator_pin = 6;
 int enable_indicator_pin = 9;
 
-
 // Pin mapping for limit switches
 // CMD -> PC0
 // SC -> PC1
@@ -44,65 +43,38 @@ bool CMD;
 bool motor_enabled;
 bool FAULT;
 
+volatile int value = 0;
+
 void setup() {
-    Serial.begin(9600);
+  Serial.begin(9600);
 
-    ////////////////////////////////////////////////////////////////
-    // Interrupts
+  cli();
+  PCICR |= 0b00000010;  // Enables Ports C Pin Change Interrupts
+  PCMSK1 |= 0b00001111; // PCINT8, 9, 10, 11 (PC0, 1, 2, 3)
+  sei();
 
-    // Configure inputs using the Data Direction Register D (DDRD)
-    // DDRD: [PD7][PD6]...[PD2][PD1] <- a 1 represents output, 0 input
-    // Therefore, clear bits that you want as input
-    DDRC &= ~_BV(DDC0); // pin PC0 (arduino A0)
-    DDRC &= ~_BV(DDC1); // pin PC1 (arduino A1)
-    DDRC &= ~_BV(DDC2); // pin PC2 (arduino A2)
-    DDRC &= ~_BV(DDC3); // pin PC3 (arduino A3)
+  // Output pins
+  pinMode(magnet_pin, OUTPUT);
+  pinMode(fault_indicator_pin, OUTPUT);
+  pinMode(enable_indicator_pin, OUTPUT);
 
-    // Enable pull-up resistors using the Port D Data Register (PORTD)
-    PORTC |= _BV(PORTC0);
-    PORTC |= _BV(PORTC1);
-    PORTC |= _BV(PORTC2);
-    PORTC |= _BV(PORTC3);
+  // Set up motor
+  motor.setMaxSpeed(motor_max_speed);
+  motor.setAcceleration(motor_max_accel);
+  disable_motor();
 
-    // Enable pin change interrupts using Pin Change Mask Register 2 (PCMSK2)
-    PCMSK2 |= _BV(PCINT8); // PCINT on PC0
-    PCMSK2 |= _BV(PCINT9); // PCINT on PC1
-    PCMSK2 |= _BV(PCINT10); // PCINT on PC2
-    PCMSK2 |= _BV(PCINT11); // PCINT on PC3
-
-    // Enable pin change interrupt 2 using the Pin Change Interrrupt Control Register (PCICR)
-    PCICR |= _BV(PCIE2);
-
-    // Enable interrupts
-    sei();
-
-    ////////////////////////////////////////////////////////////////
-
-    // Output pins
-    pinMode(magnet_pin, OUTPUT);
-    pinMode(fault_indicator_pin, OUTPUT);
-    pinMode(enable_indicator_pin, OUTPUT);
-
-    // Set up motor
-    motor.setMaxSpeed(motor_max_speed);
-    motor.setAcceleration(motor_max_accel);
-    disable_motor();
-
-    // Initialise operative state
-    update_operation();
+  // Initialise operative state
+  update_operation();
 }
 
 void loop() {
   if (motor_enabled){
-    //if (motor.distanceToGo() == 0)
-      // Have the motor continuously move
-      //motor.moveTo(motor.currentPosition()*2);
     motor.run();
   }
 }
 
-ISR(PCINT2_vect) {
-  // Handles all interrupts on port D
+ISR(PCINT1_vect) {
+  // Handles all interrupts on port C
   // Directs straight to update the operational
   // state of the device
   update_operation();
@@ -159,16 +131,15 @@ void update_operation() {
   digitalWrite(enable_indicator_pin, motor_enabled);
   digitalWrite(fault_indicator_pin, FAULT);
 
-  Serial.println("end update");
-
 }
 
 void read_state(){
   // Reads the state of inputs/limit switches
-  SC = PIND & _BV(PIND2);
-  MC = PIND & _BV(PIND3);
-  SO = PIND & _BV(PIND4);
-  CMD = PIND & _BV(PIND5);
+  // Refer to limit switch mapping at start of code
+  CMD = PINC & _BV(PINC0);
+  SC = PINC & _BV(PINC1);
+  MC = PINC & _BV(PINC2);
+  SO = PINC & _BV(PINC3);
 }
 
 void enable_motor(){
