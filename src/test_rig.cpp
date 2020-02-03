@@ -1,6 +1,12 @@
+/*
+  Microcontroller code for Jack Gooday's
+  Laser Guide Star Facility (LGSF) shutter
+*/
+
 #include "Arduino.h"
 #include "AccelStepper.h"
 
+// Functions
 void update_operation();
 void read_state();
 void enable_motor();
@@ -10,11 +16,10 @@ void motor_reverse();
 void activate_magnet();
 void deactivate_magnet();
 
-// Motor driver pins
+// Output pins
 int dir_pin = 8;
 int step_pin = 9;
 int enable_pin = 10;
-
 int magnet_pin = 13;
 int enable_indicator_pin = 12;
 int fault_indicator_pin = 11;
@@ -25,8 +30,12 @@ int fault_indicator_pin = 11;
 // SO -> PD4
 // CMD -> PD5
 
+// Motor object definition
 AccelStepper motor(1, step_pin, dir_pin);
+int motor_max_speed = 1500;
+int motor_max_accel = 1500;
 
+// System state
 bool SC;
 bool MC;
 bool SO;
@@ -69,18 +78,18 @@ void setup() {
 
     ////////////////////////////////////////////////////////////////
 
+    // Output pins
     pinMode(enable_indicator_pin, OUTPUT);
     pinMode(magnet_pin, OUTPUT);
     pinMode(fault_indicator_pin, OUTPUT);
 
     // Set up motor
-    motor.setMaxSpeed(1000);//2100);
-    motor.setAcceleration(1500);
+    motor.setMaxSpeed(motor_max_speed);
+    motor.setAcceleration(motor_max_accel);
     disable_motor();
 
     // Initialise operative state
     update_operation();
-
 }
 
 void loop() {
