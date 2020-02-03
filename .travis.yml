@@ -19,4 +19,4 @@ install:
     - platformio lib -g install 265
 
 script:
-    - platformio ci --board=uno
+    - platformio ci --board=nano
