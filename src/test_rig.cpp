@@ -17,6 +17,7 @@ int enable_pin = 10;
 
 int magnet_pin = 13;
 int enable_indicator_pin = 12;
+int fault_indicator_pin = 11;
 
 // Pin mapping for limit switches
 // SC -> PD2
@@ -32,6 +33,7 @@ bool SO;
 bool CMD;
 bool motor_enabled;
 bool MO = true;
+bool FAULT;
 
 void setup() {
     Serial.begin(9600);
@@ -69,6 +71,7 @@ void setup() {
 
     pinMode(enable_indicator_pin, OUTPUT);
     pinMode(magnet_pin, OUTPUT);
+    pinMode(fault_indicator_pin, OUTPUT);
 
     // Set up motor
     motor.setMaxSpeed(1000);//2100);
@@ -138,7 +141,14 @@ void update_operation() {
     deactivate_magnet();
   }
 
+  // Fault detection
+  FAULT = !(                    // Note inversion
+    (!CMD & !SO & SC & MC) ||   // command CLOSE, not SO, SC and MC
+    (CMD & SO & !SC & MC)       // command OPEN, SO and MC, not SC
+  );                            //  -> No fault (hence inversion)
+
   digitalWrite(enable_indicator_pin, motor_enabled);
+  digitalWrite(fault_indicator_pin, FAULT);
 
 }
 
