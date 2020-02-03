@@ -7,14 +7,16 @@ void enable_motor();
 void disable_motor();
 void motor_forwards();
 void motor_reverse();
+void activate_magnet();
+void deactivate_magnet();
 
 // Motor driver pins
 int dir_pin = 8;
 int step_pin = 9;
 int enable_pin = 10;
 
+int magnet_pin = 13;
 int enable_indicator_pin = 12;
-int dir_indicator_pin = 13;
 
 // Pin mapping for limit switches
 // SC -> PD2
@@ -65,8 +67,8 @@ void setup() {
 
     ////////////////////////////////////////////////////////////////
 
-    pinMode(12, OUTPUT); // enable indicator
-    pinMode(13, OUTPUT); // dir indicator
+    pinMode(enable_indicator_pin, OUTPUT);
+    pinMode(magnet_pin, OUTPUT);
 
     // Set up motor
     motor.setMaxSpeed(1000);//2100);
@@ -97,13 +99,15 @@ ISR(PCINT2_vect) {
 void update_operation() {
   // Reads the state of all inputs, then runs
   // the logic derived using the truth table
-  // to operate the motor
+  // to operate the motor and magnet
   //
   // Note: as there is currently no MO limit
   // switch, it's been left out of logic statements
 
+  // Read state of inputs
   read_state();
 
+  // Motor operation
   if ((!CMD & !MC) || (SO & !MC) || (CMD & !SO)) {// & !MO)) {
     // Command CLOSE & motor isn't closed
     // Shutter open & motor isn't closed
@@ -127,8 +131,14 @@ void update_operation() {
     disable_motor();
   }
 
+  // Magnet operation
+  if (CMD) {
+    activate_magnet();
+  } else {
+    deactivate_magnet();
+  }
+
   digitalWrite(enable_indicator_pin, motor_enabled);
-  digitalWrite(dir_indicator_pin, (CMD & !SO & !MO));
 
 }
 
@@ -156,12 +166,20 @@ void motor_forwards(){
   // Reset the position of the motor, then set it
   // a new large target
   motor.setCurrentPosition(0);
-  motor.moveTo(50000);
+  motor.moveTo(-50000);
 }
 
 void motor_reverse(){
   // Reset the position of the motor, then set it
   // a new large (negative) target
   motor.setCurrentPosition(0);
-  motor.moveTo(-50000);
+  motor.moveTo(50000);
+}
+
+void activate_magnet(){
+  digitalWrite(magnet_pin, HIGH);
+}
+
+void deactivate_magnet(){
+  digitalWrite(magnet_pin, LOW);
 }
