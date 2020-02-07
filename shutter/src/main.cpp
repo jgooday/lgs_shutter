@@ -33,8 +33,8 @@ int enable_indicator_pin = 9;
 
 // Motor object definition
 AccelStepper motor(1, step_pin, dir_pin);
-int motor_max_speed = 1000;
-int motor_max_accel = 1000;
+int motor_max_speed = 1500;
+int motor_max_accel = 1500;
 
 // System state
 bool SC;
@@ -92,7 +92,7 @@ void update_operation() {
   // Read state of inputs
   read_state();
 
-  print_state();
+  //print_state();
 
   // Motor operation
   if ((!CMD & !MC) || (SO & !MC) || (CMD & !SO)) {// & !MO)) {
@@ -171,14 +171,14 @@ void motor_forwards(){
   // Reset the position of the motor, then set it
   // a new large target
   motor.setCurrentPosition(0);
-  motor.moveTo(-50000);
+  motor.moveTo(50000);
 }
 
 void motor_reverse(){
   // Reset the position of the motor, then set it
   // a new large (negative) target
   motor.setCurrentPosition(0);
-  motor.moveTo(50000);
+  motor.moveTo(-50000);
 }
 
 void activate_magnet(){
