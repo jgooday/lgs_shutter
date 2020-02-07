@@ -1,0 +1,22 @@
+language: python
+python:
+    - "2.7"
+
+# Cache PlatformIO packages using Travis CI container-based infrastructure
+sudo: false
+cache:
+    directories:
+        - "~/.platformio"
+
+env:
+    - PLATFORMIO_CI_SRC=src/test_rig.cpp
+
+install:
+    - pip install -U platformio
+    - platformio update
+    # Libraries from PlatformIO Library Registry:
+    # https://platformio.org/lib/show/265/AccelStepper
+    - platformio lib -g install 265
+
+script:
+    - platformio ci --board=nanoatmega328new
