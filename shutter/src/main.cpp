@@ -9,6 +9,7 @@
 // Functions
 void update_operation();
 void read_state();
+void print_state();
 void enable_motor();
 void disable_motor();
 void motor_forwards();
@@ -32,8 +33,8 @@ int enable_indicator_pin = 9;
 
 // Motor object definition
 AccelStepper motor(1, step_pin, dir_pin);
-int motor_max_speed = 1500;
-int motor_max_accel = 1500;
+int motor_max_speed = 1000;
+int motor_max_accel = 1000;
 
 // System state
 bool SC;
@@ -91,6 +92,8 @@ void update_operation() {
   // Read state of inputs
   read_state();
 
+  print_state();
+
   // Motor operation
   if ((!CMD & !MC) || (SO & !MC) || (CMD & !SO)) {// & !MO)) {
     // Command CLOSE & motor isn't closed
@@ -140,6 +143,16 @@ void read_state(){
   SC = PINC & _BV(PINC1);
   MC = PINC & _BV(PINC2);
   SO = PINC & _BV(PINC3);
+}
+
+void print_state(){
+  Serial.print(CMD);
+  Serial.print(", ");
+  Serial.print(SC);
+  Serial.print(", ");
+  Serial.print(MC);
+  Serial.print(", ");
+  Serial.println(SO);
 }
 
 void enable_motor(){
