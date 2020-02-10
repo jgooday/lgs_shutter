@@ -13,7 +13,7 @@ void update_state();
 int command_pin = 9;
 int fault_pin = 3;         // INT1
 int max_open_time = 5000;  // Max open time of the shutter (ms)
-int max_close_time = 2000; // Max close time of the shutter (ms)
+int max_close_time = 1000; // Max close time of the shutter (ms)
 
 unsigned long start_time;
 unsigned long current_time;

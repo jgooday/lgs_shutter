@@ -2,7 +2,6 @@
 -IC:/Users/jackg/OneDrive/lgs_shutter/testing/src
 -IC:/Users/jackg/.platformio/packages/framework-arduino-avr/cores/arduino
 -IC:/Users/jackg/.platformio/packages/framework-arduino-avr/variants/standard
--IC:/Users/jackg/OneDrive/lgs_shutter/testing/.pio/libdeps/uno/Plotter_ID850
 -IC:/Users/jackg/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src
 -IC:/Users/jackg/.platformio/packages/framework-arduino-avr/libraries/HID/src
 -IC:/Users/jackg/.platformio/packages/framework-arduino-avr/libraries/SPI/src
