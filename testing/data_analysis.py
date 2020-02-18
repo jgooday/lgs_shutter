@@ -88,9 +88,11 @@ def examine_all_cycles(grouped_data):
     plt.subplot(1, 2, 1)
     open_times.plot.hist(bins=100)
     plt.title('Opening duration')
+    plt.xlabel('Duration (milliseconds)')
     plt.subplot(1, 2, 2)
     close_times.plot.hist(bins=100)
     plt.title('Closing duration')
+    plt.xlabel('Duration (milliseconds)')
     plt.show()
 
 df = pd.read_csv("results/repetition_test_2020_02_10_working.txt", index_col=False)
